@@ -1,0 +1,3 @@
+drop database if exists DBgestionIncidencias_in5cm;
+create database DBgestionIncidencias_in5cm;
+use DBgestionIncidencias_in5cm;
