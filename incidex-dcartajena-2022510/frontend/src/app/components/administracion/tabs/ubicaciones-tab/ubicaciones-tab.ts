@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CatalogoService } from '../../../../core/services/catalogo.service';
 import { Ubicacion } from '../../../../models/catalogo.model';
-
 @Component({
   selector: 'app-ubicaciones-tab',
   standalone: true,
