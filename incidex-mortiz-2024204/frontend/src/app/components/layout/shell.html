@@ -1,0 +1,49 @@
+<div class="layout">
+  <aside class="sidebar" [class.abierto]="menuAbierto()">
+    <div class="marca">
+      <div class="escudo">K</div>
+      <div>
+        <p class="marca-nombre">Fundación Kinal</p>
+        <p class="marca-slogan">Incidex</p>
+      </div>
+    </div>
+
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="activo" (click)="cerrarMenu()">Panel principal</a>
+      <a routerLink="/incidencias" routerLinkActive="activo" (click)="cerrarMenu()">Incidencias</a>
+      <a
+        *ngIf="puedeCrearIncidencia"
+        routerLink="/incidencias/nueva"
+        routerLinkActive="activo"
+        (click)="cerrarMenu()"
+      >
+        Nueva incidencia
+      </a>
+      <a *ngIf="esAdministrador" routerLink="/administracion" routerLinkActive="activo" (click)="cerrarMenu()">
+        Administración
+      </a>
+    </nav>
+
+    <div class="usuario">
+      <div class="avatar">{{ nombreCompleto | iniciales }}</div>
+      <div class="usuario-info">
+        <p class="usuario-nombre">{{ nombreCompleto }}</p>
+        <p class="usuario-rol">{{ usuario?.rol_login }}</p>
+      </div>
+    </div>
+    <button class="btn-salir" (click)="cerrarSesion()">Cerrar sesión</button>
+  </aside>
+
+  <div class="overlay" *ngIf="menuAbierto()" (click)="cerrarMenu()"></div>
+
+  <div class="contenido">
+    <header class="topbar">
+      <button class="btn-menu" (click)="toggleMenu()" aria-label="Abrir menu">☰</button>
+      <p class="topbar-institucion">Fundación Kinal · Sistema de Gestión de Incidencias</p>
+    </header>
+
+    <main class="vista">
+      <router-outlet />
+    </main>
+  </div>
+</div>
