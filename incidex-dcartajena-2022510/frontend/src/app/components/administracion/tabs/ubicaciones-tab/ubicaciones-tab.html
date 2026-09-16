@@ -1,0 +1,39 @@
+<div class="formulario-inline">
+  <input type="text" [(ngModel)]="nuevoNombre" placeholder="Nombre de la ubicación" />
+  <input type="text" [(ngModel)]="nuevoNivel" placeholder="Nivel (ej. Nivel 1)" />
+  <input type="text" [(ngModel)]="nuevaDescripcion" placeholder="Descripción (opcional)" />
+  <button class="btn btn-sm" [disabled]="guardando() || !nuevoNombre.trim()" (click)="agregar()">
+    + Agregar
+  </button>
+</div>
+
+<p class="vacio" *ngIf="cargando()">Cargando ubicaciones...</p>
+
+<div class="tabla-wrap" *ngIf="!cargando()">
+  <table>
+    <thead>
+      <tr>
+        <th>Ubicación</th>
+        <th>Nivel</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let ubi of ubicaciones()">
+        <td class="titulo-celda">{{ ubi.nombre_ubicacion }}</td>
+        <td>{{ ubi.nivel || '—' }}</td>
+        <td>
+          <span class="badge" [ngClass]="ubi.estado_ubicacion ? 'estado-resuelto' : 'estado-cerrado'">
+            {{ ubi.estado_ubicacion ? 'Activa' : 'Inactiva' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-outline" (click)="toggleEstado(ubi)">
+            {{ ubi.estado_ubicacion ? 'Desactivar' : 'Activar' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
