@@ -1,0 +1,42 @@
+<div class="formulario-inline">
+  <select [(ngModel)]="nuevoDepartamento">
+    <option [ngValue]="null" disabled>Departamento</option>
+    <option *ngFor="let d of departamentos()" [ngValue]="d.id_departamento">{{ d.nombre_departamento }}</option>
+  </select>
+  <input type="text" [(ngModel)]="nuevoNombre" placeholder="Nombre de la categoría" />
+  <input type="text" [(ngModel)]="nuevaDescripcion" placeholder="Descripción (opcional)" />
+  <button class="btn btn-sm" [disabled]="guardando() || !nuevoNombre.trim() || !nuevoDepartamento" (click)="agregar()">
+    + Agregar
+  </button>
+</div>
+
+<p class="vacio" *ngIf="cargando()">Cargando categorías...</p>
+
+<div class="tabla-wrap" *ngIf="!cargando()">
+  <table>
+    <thead>
+      <tr>
+        <th>Categoría</th>
+        <th>Departamento</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cat of categorias()">
+        <td class="titulo-celda">{{ cat.nombre_categoria }}</td>
+        <td>{{ cat.nombre_departamento }}</td>
+        <td>
+          <span class="badge" [ngClass]="cat.estado_categoria ? 'estado-resuelto' : 'estado-cerrado'">
+            {{ cat.estado_categoria ? 'Activa' : 'Inactiva' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-outline" (click)="toggleEstado(cat)">
+            {{ cat.estado_categoria ? 'Desactivar' : 'Activar' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
