@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { RespuestaApi } from '../../models/api-response.model';
-import { Categoria, Departamento, Prioridad, Ubicacion } from '../../models/catalogo.model';
+import { Categoria, Departamento, Prioridad, Ubicacion } from '../../models/catalogo.models';
 
 const API_URL = 'http://localhost:3000/api';
 
