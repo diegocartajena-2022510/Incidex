@@ -1,0 +1,16 @@
+.formulario-tarjeta {
+  max-width: 780px;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.acciones .btn-outline {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
