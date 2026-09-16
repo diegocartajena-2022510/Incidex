@@ -8,39 +8,33 @@ export const listarIncidencias = async (req: Request, res: Response) => {
 
   const condiciones: string[] = [];
   const valores: any[] = [];
+  let indice = 1;
 
-  if (estado) {
-    condiciones.push('i.estado_incidencia = ?');
-    valores.push(estado);
-  }
-  if (categoria) {
-    condiciones.push('i.id_categoria = ?');
-    valores.push(categoria);
-  }
-  if (prioridad) {
-    condiciones.push('i.id_prioridad = ?');
-    valores.push(prioridad);
-  }
-  if (ubicacion) {
-    condiciones.push('i.id_ubicacion = ?');
-    valores.push(ubicacion);
-  }
-  if (usuario) {
-    condiciones.push('i.id_usuario = ?');
-    valores.push(usuario);
-  }
+  const agregarCondicion = (columna: string, valor: unknown) => {
+    condiciones.push(`${columna} = $${indice}`);
+    valores.push(valor);
+    indice++;
+  };
+
+  if (estado) agregarCondicion('i.estado_incidencia', estado);
+  if (categoria) agregarCondicion('i.id_categoria', categoria);
+  if (prioridad) agregarCondicion('i.id_prioridad', prioridad);
+  if (ubicacion) agregarCondicion('i.id_ubicacion', ubicacion);
+  if (usuario) agregarCondicion('i.id_usuario', usuario);
   if (desde) {
-    condiciones.push('i.fecha_creacion >= ?');
+    condiciones.push(`i.fecha_creacion >= $${indice}`);
     valores.push(desde);
+    indice++;
   }
   if (hasta) {
-    condiciones.push('i.fecha_creacion <= ?');
+    condiciones.push(`i.fecha_creacion <= $${indice}`);
     valores.push(hasta);
+    indice++;
   }
 
   const where = condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : '';
 
-  const [rows] = await pool.query(
+  const resultado = await pool.query(
     `SELECT
        i.id_incidencia, i.titulo_incidencia, i.descripcion_incidencia, i.estado_incidencia,
        i.fecha_creacion, i.fecha_resolucion,
@@ -58,12 +52,13 @@ export const listarIncidencias = async (req: Request, res: Response) => {
     valores
   );
 
-  ok(res, rows);
+  ok(res, resultado.rows);
 };
 
 export const obtenerIncidencia = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const [rows]: any = await pool.query(
+
+  const incidenciaResultado = await pool.query(
     `SELECT
        i.*, concat(u.nombre_usuario, ' ', u.apellido_usuario) AS usuario,
        c.nombre_categoria, ub.nombre_ubicacion, p.nombre_prioridad
@@ -72,25 +67,63 @@ export const obtenerIncidencia = async (req: Request, res: Response) => {
      INNER JOIN categorias c ON i.id_categoria = c.id_categoria
      INNER JOIN ubicaciones ub ON i.id_ubicacion = ub.id_ubicacion
      INNER JOIN prioridades p ON i.id_prioridad = p.id_prioridad
-     WHERE i.id_incidencia = ?`,
+     WHERE i.id_incidencia = $1`,
     [id]
   );
 
-  if (!rows[0]) {
+  if (!incidenciaResultado.rows[0]) {
     return error(res, 'Incidencia no encontrada', 404);
   }
 
-  const [comentarios] = await pool.query('CALL sp_listarcomentarios()');
-  const [adjuntos] = await pool.query('CALL sp_listaradjuntos()');
-  const [historial] = await pool.query('CALL sp_listarhistorial()');
-  const [asignaciones] = await pool.query('CALL sp_listarasignaciones()');
+  const [comentarios, adjuntos, historial, asignaciones] = await Promise.all([
+    pool.query(
+      `SELECT c.id_comentario, c.id_incidencia, c.id_usuario,
+              concat(u.nombre_usuario, ' ', u.apellido_usuario) AS usuario,
+              c.comentario, c.fecha_comentario
+       FROM comentarios c
+       INNER JOIN usuarios u ON c.id_usuario = u.id_usuario
+       WHERE c.id_incidencia = $1
+       ORDER BY c.fecha_comentario`,
+      [id]
+    ),
+    pool.query(
+      `SELECT a.id_adjunto, a.id_incidencia, a.id_usuario,
+              concat(u.nombre_usuario, ' ', u.apellido_usuario) AS usuario,
+              a.nombre_archivo, a.ruta_archivo, a.tipo_archivo, a.fecha_archivo
+       FROM adjuntos a
+       INNER JOIN usuarios u ON a.id_usuario = u.id_usuario
+       WHERE a.id_incidencia = $1
+       ORDER BY a.fecha_archivo`,
+      [id]
+    ),
+    pool.query(
+      `SELECT h.id_historial, h.id_incidencia, h.id_usuario,
+              concat(u.nombre_usuario, ' ', u.apellido_usuario) AS usuario,
+              h.estado_anterior, h.estado_nuevo, h.comentario, h.fecha_cambio
+       FROM historialincidencias h
+       INNER JOIN usuarios u ON h.id_usuario = u.id_usuario
+       WHERE h.id_incidencia = $1
+       ORDER BY h.fecha_cambio DESC`,
+      [id]
+    ),
+    pool.query(
+      `SELECT a.id_asignacion, a.id_incidencia, a.id_usuario,
+              concat(u.nombre_usuario, ' ', u.apellido_usuario) AS usuario,
+              a.fecha_asignacion, a.fecha_finalizacion, a.observaciones, a.estado_asignacion
+       FROM asignaciones a
+       INNER JOIN usuarios u ON a.id_usuario = u.id_usuario
+       WHERE a.id_incidencia = $1
+       ORDER BY a.fecha_asignacion DESC`,
+      [id]
+    ),
+  ]);
 
   ok(res, {
-    incidencia: rows[0],
-    comentarios: (comentarios as any)[0].filter((c: any) => c.id_incidencia === Number(id)),
-    adjuntos: (adjuntos as any)[0].filter((a: any) => a.id_incidencia === Number(id)),
-    historial: (historial as any)[0].filter((h: any) => h.id_incidencia === Number(id)),
-    asignaciones: (asignaciones as any)[0].filter((a: any) => a.id_incidencia === Number(id)),
+    incidencia: incidenciaResultado.rows[0],
+    comentarios: comentarios.rows,
+    adjuntos: adjuntos.rows,
+    historial: historial.rows,
+    asignaciones: asignaciones.rows,
   });
 };
 
@@ -102,36 +135,31 @@ export const crearIncidencia = async (req: AuthRequest, res: Response) => {
     return error(res, 'Faltan datos obligatorios para registrar la incidencia');
   }
 
-  const conn = await pool.getConnection();
+  const cliente = await pool.connect();
   try {
-    await conn.beginTransaction();
+    await cliente.query('BEGIN');
 
-    await conn.query('CALL sp_agregarincidencia(?, ?, ?, ?, ?, ?)', [
-      id_usuario,
-      id_categoria,
-      id_ubicacion,
-      id_prioridad,
-      titulo_incidencia,
-      descripcion_incidencia,
-    ]);
-    const [idRows]: any = await conn.query('SELECT LAST_INSERT_ID() AS id');
-    const idIncidencia = idRows[0].id;
+    const incidenciaResultado = await cliente.query(
+      `INSERT INTO incidencias (id_usuario, id_categoria, id_ubicacion, id_prioridad, titulo_incidencia, descripcion_incidencia)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id_incidencia`,
+      [id_usuario, id_categoria, id_ubicacion, id_prioridad, titulo_incidencia, descripcion_incidencia]
+    );
+    const idIncidencia = incidenciaResultado.rows[0].id_incidencia;
 
-    await conn.query('CALL sp_agregarhistorial(?, ?, ?, ?, ?)', [
-      idIncidencia,
-      id_usuario,
-      null,
-      'Pendiente',
-      'Incidencia registrada en el sistema',
-    ]);
+    await cliente.query(
+      `INSERT INTO historialincidencias (id_incidencia, id_usuario, estado_anterior, estado_nuevo, comentario)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [idIncidencia, id_usuario, null, 'Pendiente', 'Incidencia registrada en el sistema']
+    );
 
-    await conn.commit();
+    await cliente.query('COMMIT');
     ok(res, { id_incidencia: idIncidencia }, 'Incidencia registrada correctamente', 201);
   } catch (err) {
-    await conn.rollback();
+    await cliente.query('ROLLBACK');
     throw err;
   } finally {
-    conn.release();
+    cliente.release();
   }
 };
 
@@ -149,57 +177,67 @@ export const actualizarIncidencia = async (req: AuthRequest, res: Response) => {
     comentario,
   } = req.body;
 
-  const [actualRows]: any = await pool.query('SELECT estado_incidencia FROM incidencias WHERE id_incidencia = ?', [
+  const actualResultado = await pool.query('SELECT estado_incidencia FROM incidencias WHERE id_incidencia = $1', [
     id,
   ]);
-  if (!actualRows[0]) {
+  if (!actualResultado.rows[0]) {
     return error(res, 'Incidencia no encontrada', 404);
   }
-  const estadoAnterior = actualRows[0].estado_incidencia;
+  const estadoAnterior = actualResultado.rows[0].estado_incidencia;
 
-  const conn = await pool.getConnection();
+  const cliente = await pool.connect();
   try {
-    await conn.beginTransaction();
+    await cliente.query('BEGIN');
 
-    await conn.query('CALL sp_actualizarincidencia(?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-      id,
-      id_usuario,
-      id_categoria,
-      id_ubicacion,
-      id_prioridad,
-      titulo_incidencia,
-      descripcion_incidencia,
-      estado_incidencia,
-      fecha_resolucion || null,
-    ]);
+    await cliente.query(
+      `UPDATE incidencias
+       SET id_usuario = $1, id_categoria = $2, id_ubicacion = $3, id_prioridad = $4,
+           titulo_incidencia = $5, descripcion_incidencia = $6, estado_incidencia = $7, fecha_resolucion = $8
+       WHERE id_incidencia = $9`,
+      [
+        id_usuario,
+        id_categoria,
+        id_ubicacion,
+        id_prioridad,
+        titulo_incidencia,
+        descripcion_incidencia,
+        estado_incidencia,
+        fecha_resolucion || null,
+        id,
+      ]
+    );
 
     if (estado_incidencia && estado_incidencia !== estadoAnterior && req.usuario) {
-      const [usuarioRows]: any = await conn.query('SELECT id_usuario FROM usuarios WHERE id_login = ?', [
+      const usuarioResultado = await cliente.query('SELECT id_usuario FROM usuarios WHERE id_login = $1', [
         req.usuario.id_login,
       ]);
-      const idUsuarioHistorial = usuarioRows[0]?.id_usuario || id_usuario;
+      const idUsuarioHistorial = usuarioResultado.rows[0]?.id_usuario || id_usuario;
 
-      await conn.query('CALL sp_agregarhistorial(?, ?, ?, ?, ?)', [
-        id,
-        idUsuarioHistorial,
-        estadoAnterior,
-        estado_incidencia,
-        comentario || `Estado actualizado de ${estadoAnterior} a ${estado_incidencia}`,
-      ]);
+      await cliente.query(
+        `INSERT INTO historialincidencias (id_incidencia, id_usuario, estado_anterior, estado_nuevo, comentario)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [
+          id,
+          idUsuarioHistorial,
+          estadoAnterior,
+          estado_incidencia,
+          comentario || `Estado actualizado de ${estadoAnterior} a ${estado_incidencia}`,
+        ]
+      );
     }
 
-    await conn.commit();
+    await cliente.query('COMMIT');
     ok(res, null, 'Incidencia actualizada correctamente');
   } catch (err) {
-    await conn.rollback();
+    await cliente.query('ROLLBACK');
     throw err;
   } finally {
-    conn.release();
+    cliente.release();
   }
 };
 
 export const eliminarIncidencia = async (req: Request, res: Response) => {
   const { id } = req.params;
-  await pool.query('CALL sp_eliminarincidencia(?)', [id]);
+  await pool.query('DELETE FROM incidencias WHERE id_incidencia = $1', [id]);
   ok(res, null, 'Incidencia eliminada correctamente');
 };
