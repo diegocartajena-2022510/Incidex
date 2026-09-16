@@ -1,19 +1,17 @@
-import mysql from 'mysql2/promise';
+import { Pool } from 'pg';
 import 'dotenv/config';
 
-export const pool = mysql.createPool({
+export const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
-  port: Number(process.env.DB_PORT) || 3306,
-  user: process.env.DB_USER || 'IN5CM',
-  password: process.env.DB_PASSWORD || '?donmoA5m@',
-  database: process.env.DB_NAME || 'DBgestionIncidencias_in5cm',
-  waitForConnections: true,
-  connectionLimit: 10,
-  dateStrings: true,
+  port: Number(process.env.DB_PORT) || 5432,
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || 'admin',
+  database: process.env.DB_NAME || 'dbgestionincidencias_postgresql',
+  max: 10,
 });
 
 export const probarConexion = async () => {
-  const conn = await pool.getConnection();
-  await conn.ping();
-  conn.release();
+  const cliente = await pool.connect();
+  await cliente.query('SELECT 1');
+  cliente.release();
 };
