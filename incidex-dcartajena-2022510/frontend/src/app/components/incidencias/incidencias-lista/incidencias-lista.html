@@ -1,0 +1,75 @@
+<div class="encabezado encabezado-fila">
+  <div>
+    <h1>Incidencias</h1>
+    <p class="saludo">Consulta, filtra y da seguimiento a las incidencias registradas</p>
+  </div>
+  <a *ngIf="puedeCrear" routerLink="/incidencias/nueva" class="btn">+ Nueva incidencia</a>
+</div>
+
+<div class="banner error" *ngIf="mensajeError()">{{ mensajeError() }}</div>
+
+<div class="tarjeta">
+  <div class="filtros">
+    <input
+      type="text"
+      [(ngModel)]="busqueda"
+      placeholder="Buscar por título..."
+    />
+    <select [(ngModel)]="filtroEstado" (change)="cargarIncidencias()">
+      <option value="">Todos los estados</option>
+      <option *ngFor="let e of estados" [value]="e">{{ e | estadoLegible }}</option>
+    </select>
+    <select [(ngModel)]="filtroPrioridad" (change)="cargarIncidencias()">
+      <option value="">Todas las prioridades</option>
+      <option *ngFor="let p of prioridades()" [value]="p.id_prioridad">{{ p.nombre_prioridad | prioridadLegible }}</option>
+    </select>
+    <select [(ngModel)]="filtroCategoria" (change)="cargarIncidencias()">
+      <option value="">Todas las categorías</option>
+      <option *ngFor="let c of categorias()" [value]="c.id_categoria">{{ c.nombre_categoria }}</option>
+    </select>
+    <select [(ngModel)]="filtroUbicacion" (change)="cargarIncidencias()">
+      <option value="">Todas las ubicaciones</option>
+      <option *ngFor="let u of ubicaciones()" [value]="u.id_ubicacion">{{ u.nombre_ubicacion }}</option>
+    </select>
+  </div>
+
+  <p class="vacio" *ngIf="cargando()">Cargando incidencias...</p>
+  <p class="vacio" *ngIf="!cargando() && incidenciasFiltradas.length === 0">
+    No se encontraron incidencias con los filtros seleccionados.
+  </p>
+
+  <div class="tabla-wrap" *ngIf="!cargando() && incidenciasFiltradas.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Título</th>
+          <th>Categoría</th>
+          <th>Ubicación</th>
+          <th>Prioridad</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let inc of incidenciasFiltradas" (click)="irADetalle(inc.id_incidencia)">
+          <td>{{ inc.id_incidencia }}</td>
+          <td class="titulo-celda">{{ inc.titulo_incidencia }}</td>
+          <td>{{ inc.nombre_categoria }}</td>
+          <td>{{ inc.nombre_ubicacion }}</td>
+          <td>
+            <span class="badge" [ngClass]="inc.nombre_prioridad | clasePrioridad">
+              {{ inc.nombre_prioridad | prioridadLegible }}
+            </span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="inc.estado_incidencia | claseEstado">
+              {{ inc.estado_incidencia | estadoLegible }}
+            </span>
+          </td>
+          <td>{{ inc.fecha_creacion | fechaCorta }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
