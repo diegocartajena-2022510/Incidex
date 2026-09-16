@@ -1,0 +1,135 @@
+<div class="encabezado encabezado-fila">
+  <div>
+    <a routerLink="/incidencias" class="volver">← Volver a incidencias</a>
+    <h1>Incidencia #{{ idIncidencia }}</h1>
+  </div>
+  <button *ngIf="esAdministrador && detalle()" class="btn btn-danger btn-sm" (click)="eliminarIncidencia()">
+    Eliminar incidencia
+  </button>
+</div>
+
+<p class="vacio" *ngIf="cargando()">Cargando incidencia...</p>
+<div class="banner error" *ngIf="mensajeError()">{{ mensajeError() }}</div>
+<div class="banner exito" *ngIf="mensajeExito()">{{ mensajeExito() }}</div>
+
+<div class="detalle-grid" *ngIf="!cargando() && detalle() as data">
+  <!-- Columna principal -->
+  <div class="columna-principal">
+    <div class="tarjeta">
+      <div class="titulo-fila">
+        <h2>{{ data.incidencia.titulo_incidencia }}</h2>
+        <div class="badges-fila">
+          <span class="badge" [ngClass]="data.incidencia.nombre_prioridad | clasePrioridad">
+            {{ data.incidencia.nombre_prioridad | prioridadLegible }}
+          </span>
+          <span class="badge" [ngClass]="data.incidencia.estado_incidencia | claseEstado">
+            {{ data.incidencia.estado_incidencia | estadoLegible }}
+          </span>
+        </div>
+      </div>
+
+      <p class="descripcion">{{ data.incidencia.descripcion_incidencia }}</p>
+
+      <div class="meta-grid">
+        <div><b>Reportado por</b>{{ data.incidencia.usuario }}</div>
+        <div><b>Fecha de creación</b>{{ data.incidencia.fecha_creacion | fechaCorta:true }}</div>
+        <div><b>Categoría</b>{{ data.incidencia.nombre_categoria }}</div>
+        <div><b>Departamento</b>{{ nombreDepartamentoCategoria }}</div>
+        <div><b>Ubicación</b>{{ data.incidencia.nombre_ubicacion }}</div>
+        <div><b>Asignado a</b>{{ asignacionActiva?.usuario || 'Sin asignar' }}</div>
+      </div>
+
+      <div class="adjuntos" *ngIf="data.adjuntos.length > 0">
+        <b class="adjuntos-titulo">Adjuntos</b>
+        <div class="adjuntos-lista">
+          <span class="adjunto-chip" *ngFor="let adj of data.adjuntos">{{ adj.nombre_archivo }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <h3 class="subtitulo-seccion">Comentarios</h3>
+
+      <p class="vacio" *ngIf="data.comentarios.length === 0">Aún no hay comentarios.</p>
+
+      <div class="comentario" *ngFor="let c of data.comentarios">
+        <div class="comentario-avatar">{{ c.usuario | iniciales }}</div>
+        <div class="comentario-cuerpo">
+          <p class="comentario-meta">{{ c.usuario }} · {{ c.fecha_comentario | fechaCorta:true }}</p>
+          <p>{{ c.comentario }}</p>
+        </div>
+      </div>
+
+      <div class="agregar-comentario">
+        <input
+          type="text"
+          [(ngModel)]="nuevoComentario"
+          placeholder="Escribe un comentario..."
+          (keyup.enter)="enviarComentario()"
+        />
+        <button class="btn btn-sm" [disabled]="enviandoComentario() || !nuevoComentario.trim()" (click)="enviarComentario()">
+          Enviar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Columna lateral -->
+  <div class="columna-lateral">
+    <div class="tarjeta" *ngIf="puedeGestionar && siguientesEstados.length > 0">
+      <h3 class="subtitulo-seccion">Gestión</h3>
+
+      <div class="campo" *ngIf="esAdministrador">
+        <label for="asignar">Asignar a</label>
+        <div class="fila-accion">
+          <select id="asignar" [(ngModel)]="usuarioAsignar">
+            <option [ngValue]="null" disabled>Selecciona un responsable</option>
+            <option *ngFor="let u of usuariosDelDepartamento" [ngValue]="u.id_usuario">
+              {{ u.nombre_usuario }} {{ u.apellido_usuario }}
+            </option>
+          </select>
+          <button class="btn btn-sm" [disabled]="asignando() || !usuarioAsignar" (click)="asignarResponsable()">
+            Asignar
+          </button>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="estado">Cambiar estado</label>
+        <select id="estado" [(ngModel)]="nuevoEstado">
+          <option value="" disabled>Selecciona un estado</option>
+          <option *ngFor="let e of siguientesEstados" [value]="e">{{ e | estadoLegible }}</option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="comentarioEstado">Comentario del cambio (opcional)</label>
+        <input id="comentarioEstado" type="text" [(ngModel)]="comentarioEstado" placeholder="Ej. Se resolvió el problema" />
+      </div>
+
+      <button class="btn" style="width: 100%" [disabled]="actualizandoEstado() || !nuevoEstado" (click)="actualizarEstado()">
+        {{ actualizandoEstado() ? 'Actualizando...' : 'Actualizar estado' }}
+      </button>
+    </div>
+
+    <div class="tarjeta" *ngIf="puedeGestionar && siguientesEstados.length === 0">
+      <h3 class="subtitulo-seccion">Gestión</h3>
+      <p class="vacio">Esta incidencia está cerrada.</p>
+    </div>
+
+    <div class="tarjeta">
+      <h3 class="subtitulo-seccion">Historial</h3>
+
+      <p class="vacio" *ngIf="data.historial.length === 0">Sin cambios registrados.</p>
+
+      <ul class="timeline" *ngIf="data.historial.length > 0">
+        <li *ngFor="let h of data.historial">
+          <span *ngIf="h.estado_anterior">{{ h.estado_anterior | estadoLegible }} → </span>
+          <b>{{ h.estado_nuevo | estadoLegible }}</b>
+          <small>{{ h.usuario }} · {{ h.fecha_cambio | fechaCorta:true }}</small>
+          <small class="historial-comentario" *ngIf="h.comentario">"{{ h.comentario }}"</small>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
