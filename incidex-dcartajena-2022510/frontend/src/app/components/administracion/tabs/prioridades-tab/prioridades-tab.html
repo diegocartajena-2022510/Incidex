@@ -1,0 +1,34 @@
+<p class="nota">
+  Las prioridades disponibles están definidas en la base de datos. Desde aquí solo se puede activar o desactivar.
+</p>
+
+<p class="vacio" *ngIf="cargando()">Cargando prioridades...</p>
+
+<div class="tabla-wrap" *ngIf="!cargando()">
+  <table>
+    <thead>
+      <tr>
+        <th>Prioridad</th>
+        <th>Descripción</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of prioridades()">
+        <td class="titulo-celda">{{ p.nombre_prioridad | prioridadLegible }}</td>
+        <td>{{ p.descripcion || '—' }}</td>
+        <td>
+          <span class="badge" [ngClass]="p.estado_prioridad ? 'estado-resuelto' : 'estado-cerrado'">
+            {{ p.estado_prioridad ? 'Activa' : 'Inactiva' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-outline" (click)="toggleEstado(p)">
+            {{ p.estado_prioridad ? 'Desactivar' : 'Activar' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
