@@ -1,0 +1,38 @@
+<div class="formulario-inline">
+  <input type="text" [(ngModel)]="nuevoNombre" placeholder="Nombre del departamento" />
+  <input type="text" [(ngModel)]="nuevaDescripcion" placeholder="Descripción (opcional)" />
+  <button class="btn btn-sm" [disabled]="guardando() || !nuevoNombre.trim()" (click)="agregar()">
+    + Agregar
+  </button>
+</div>
+
+<p class="vacio" *ngIf="cargando()">Cargando departamentos...</p>
+
+<div class="tabla-wrap" *ngIf="!cargando()">
+  <table>
+    <thead>
+      <tr>
+        <th>Departamento</th>
+        <th>Descripción</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let dep of departamentos()">
+        <td class="titulo-celda">{{ dep.nombre_departamento }}</td>
+        <td>{{ dep.descripcion || '—' }}</td>
+        <td>
+          <span class="badge" [ngClass]="dep.estado_departamento ? 'estado-resuelto' : 'estado-cerrado'">
+            {{ dep.estado_departamento ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-outline" (click)="toggleEstado(dep)">
+            {{ dep.estado_departamento ? 'Desactivar' : 'Activar' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
