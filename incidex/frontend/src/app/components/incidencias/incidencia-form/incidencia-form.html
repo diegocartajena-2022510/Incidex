@@ -66,6 +66,37 @@
       </p>
     </div>
 
+    <div class="campo full">
+      <label for="adjuntos">Archivos adjuntos (opcional)</label>
+      <div class="zona-archivos">
+        <label for="adjuntos" class="boton-archivo">
+          <svg class="icono-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 8.5 9.4 16.6a3 3 0 1 1-4.2-4.2l8.1-8.1a4.5 4.5 0 1 1 6.36 6.36L11.5 18.7" />
+          </svg>
+          Seleccionar archivos
+          <input
+            id="adjuntos"
+            type="file"
+            multiple
+            accept="image/*,video/*,.pdf,.doc,.docx,.txt"
+            (change)="onArchivosSeleccionados($event)"
+            hidden
+          />
+        </label>
+        <span class="nota-archivo">Imágenes, video o documentos · máx. 10 MB por archivo</span>
+      </div>
+
+      <p class="error-texto" *ngIf="mensajeArchivo()">{{ mensajeArchivo() }}</p>
+
+      <ul class="lista-archivos" *ngIf="archivosSeleccionados().length > 0">
+        <li *ngFor="let archivo of archivosSeleccionados(); let i = index">
+          <span class="archivo-nombre">{{ archivo.name }}</span>
+          <span class="archivo-tamano">{{ formatearTamano(archivo.size) }}</span>
+          <button type="button" class="btn-quitar" (click)="quitarArchivo(i)" aria-label="Quitar archivo">✕</button>
+        </li>
+      </ul>
+    </div>
+
     <div class="campo full acciones">
       <a routerLink="/incidencias" class="btn btn-outline">Cancelar</a>
       <button type="submit" class="btn" [disabled]="enviando()">
