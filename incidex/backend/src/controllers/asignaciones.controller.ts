@@ -20,12 +20,37 @@ export const crearAsignacion = async (req: Request, res: Response) => {
   if (!id_incidencia || !id_usuario) {
     return error(res, 'Faltan datos obligatorios para asignar la incidencia');
   }
-  await pool.query('INSERT INTO asignaciones (id_incidencia, id_usuario, observaciones) VALUES ($1, $2, $3)', [
-    id_incidencia,
-    id_usuario,
-    observaciones || null,
-  ]);
-  ok(res, null, 'Asignacion creada correctamente', 201);
+
+  const cliente = await pool.connect();
+  try {
+    await cliente.query('BEGIN');
+
+    await cliente.query('INSERT INTO asignaciones (id_incidencia, id_usuario, observaciones) VALUES ($1, $2, $3)', [
+      id_incidencia,
+      id_usuario,
+      observaciones || null,
+    ]);
+
+    const incidenciaResultado = await cliente.query(
+      'SELECT titulo_incidencia FROM incidencias WHERE id_incidencia = $1',
+      [id_incidencia]
+    );
+    const titulo = incidenciaResultado.rows[0]?.titulo_incidencia || 'una incidencia';
+
+    await cliente.query(
+      `INSERT INTO notificaciones (id_usuario, id_incidencia, mensaje)
+       VALUES ($1, $2, $3)`,
+      [id_usuario, id_incidencia, `Se te asignó la incidencia: "${titulo}"`]
+    );
+
+    await cliente.query('COMMIT');
+    ok(res, null, 'Asignacion creada correctamente', 201);
+  } catch (err) {
+    await cliente.query('ROLLBACK');
+    throw err;
+  } finally {
+    cliente.release();
+  }
 };
 
 export const actualizarAsignacion = async (req: Request, res: Response) => {
