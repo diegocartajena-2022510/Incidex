@@ -1,17 +1,39 @@
 <div class="pantalla">
   <div class="panel-marca">
-    <div class="marca">
-      <div class="escudo">K</div>
-      <div>
-        <p class="marca-nombre">Fundación Kinal</p>
-        <p class="marca-slogan">Incidex</p>
+    <div class="capa-oscura"></div>
+
+    <div class="contenido-marca">
+      <div class="marca">
+        <div class="escudo">K</div>
+        <div>
+          <p class="marca-nombre">Fundación Kinal</p>
+          <p class="marca-slogan">Incidex</p>
+        </div>
       </div>
+
+      <div class="texto-principal">
+        <h1>Sistema de Gestión de <span>Incidencias</span></h1>
+        <p class="descripcion">
+          Registra, clasifica y da seguimiento a las incidencias de tecnología, servicios generales
+          e infraestructura dentro de la institución, desde un solo lugar.
+        </p>
+      </div>
+
+      <ul class="caracteristicas">
+        <li>
+          <span class="icono">✓</span>
+          <span>Reporta problemas de TICS, servicios generales e infraestructura</span>
+        </li>
+        <li>
+          <span class="icono">✓</span>
+          <span>Seguimiento en tiempo real del estado de cada incidencia</span>
+        </li>
+        <li>
+          <span class="icono">✓</span>
+          <span>Historial completo y asignación por departamento responsable</span>
+        </li>
+      </ul>
     </div>
-    <h1>Sistema de Gestión de Incidencias</h1>
-    <p class="descripcion">
-      Registra, clasifica y da seguimiento a las incidencias de tecnología, servicios generales
-      e infraestructura dentro de la institución, desde un solo lugar.
-    </p>
   </div>
 
   <div class="panel-formulario">
@@ -54,6 +76,8 @@
           {{ enviando() ? 'Ingresando...' : 'Iniciar sesión' }}
         </button>
       </form>
+
+      <p class="pie-tarjeta">¿Problemas para ingresar? Contacta al departamento de TICS.</p>
     </div>
   </div>
 </div>
