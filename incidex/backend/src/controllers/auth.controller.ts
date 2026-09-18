@@ -11,13 +11,20 @@ export const iniciarSesion = async (req: Request, res: Response) => {
   }
 
   const resultado = await pool.query(
-    'SELECT * FROM login WHERE (usuario_login = $1 OR correo_login = $1) AND estado_login = TRUE',
+    `SELECT l.*, u.estado_usuario
+     FROM login l
+     INNER JOIN usuarios u ON l.id_login = u.id_login
+     WHERE (l.usuario_login = $1 OR l.correo_login = $1) AND l.estado_login = TRUE`,
     [usuario]
   );
   const cuenta = resultado.rows[0];
 
   if (!cuenta || cuenta.contrasena_login !== contrasena) {
     return error(res, 'Credenciales invalidas', 401);
+  }
+
+  if (!cuenta.estado_usuario) {
+    return error(res, 'Esta cuenta se encuentra desactivada. Contacta a un administrador.', 401);
   }
 
   const token = generarToken({
