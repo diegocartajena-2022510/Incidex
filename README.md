@@ -96,48 +96,6 @@ La base de datos contiene las principales entidades necesarias para el funcionam
 -Navegador web
 -Herramientas de diseño y documentación
 
-Estructura del proyecto
-Incidex-develop/
-│
-├── ETAPAS/
-│   ├── ETAPA1.pdf
-│   ├── ETAPA2.pdf
-│   ├── ETAPA3.pdf
-│   ├── ETAPA4.pdf
-│   ├── ETAPA5.pdf
-│   ├── ETAPA6.pdf
-│   ├── ETAPA7.pdf
-│   └── Matrices.pdf
-│
-├── incidex/
-│   │
-│   ├── backend/
-│   │   ├── src/
-│   │   │   ├── config/
-│   │   │   ├── controllers/
-│   │   │   ├── middlewares/
-│   │   │   ├── routes/
-│   │   │   ├── types/
-│   │   │   ├── utils/
-│   │   │   ├── app.ts
-│   │   │   └── index.ts
-│   │   ├── .env.example
-│   │   └── package.json
-│   │
-│   └── frontend/
-│       ├── src/
-│       │   └── app/
-│       │       ├── components/
-│       │       ├── core/
-│       │       ├── models/
-│       │       └── pipe/
-│       ├── angular.json
-│       └── package.json
-│
-├── dbgestionincidencias_postgresql.sql
-├── LICENSE
-└── README.md
-
 Instalación y configuración
 1. Requisitos previos
 Antes de ejecutar el proyecto es necesario tener instalado:
