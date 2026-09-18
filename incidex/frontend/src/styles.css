@@ -282,30 +282,20 @@ table tbody tr:hover {
   white-space: nowrap;
 }
 
-.estado-pendiente,
 .badge.estado-pendiente {
   background: var(--estado-pendiente);
-  border-left-color: var(--estado-pendiente);
 }
-.estado-revision,
 .badge.estado-revision {
   background: var(--estado-revision);
-  border-left-color: var(--estado-revision);
 }
-.estado-proceso,
 .badge.estado-proceso {
   background: var(--estado-proceso);
-  border-left-color: var(--estado-proceso);
 }
-.estado-resuelto,
 .badge.estado-resuelto {
   background: var(--estado-resuelto);
-  border-left-color: var(--estado-resuelto);
 }
-.estado-cerrado,
 .badge.estado-cerrado {
   background: var(--estado-cerrado);
-  border-left-color: var(--estado-cerrado);
 }
 
 .badge.prioridad-baja {
@@ -440,3 +430,4 @@ textarea.invalido {
   font-size: 0.85rem;
   margin-bottom: 1.1rem;
 }
+
