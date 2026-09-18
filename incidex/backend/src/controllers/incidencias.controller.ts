@@ -153,6 +153,28 @@ export const crearIncidencia = async (req: AuthRequest, res: Response) => {
       [idIncidencia, id_usuario, null, 'Pendiente', 'Incidencia registrada en el sistema']
     );
 
+    // Notificar al personal del departamento responsable y a los administradores
+    const destinatariosResultado = await cliente.query(
+      `SELECT DISTINCT u.id_usuario
+       FROM usuarios u
+       INNER JOIN login l ON u.id_login = l.id_login
+       WHERE u.estado_usuario = TRUE
+         AND (
+           l.rol_login = 'Administrador'
+           OR u.id_departamento = (SELECT id_departamento FROM categorias WHERE id_categoria = $1)
+         )
+         AND u.id_usuario != $2`,
+      [id_categoria, id_usuario]
+    );
+
+    for (const fila of destinatariosResultado.rows) {
+      await cliente.query(
+        `INSERT INTO notificaciones (id_usuario, id_incidencia, mensaje)
+         VALUES ($1, $2, $3)`,
+        [fila.id_usuario, idIncidencia, `Nueva incidencia registrada: "${titulo_incidencia}"`]
+      );
+    }
+
     await cliente.query('COMMIT');
     ok(res, { id_incidencia: idIncidencia }, 'Incidencia registrada correctamente', 201);
   } catch (err) {
@@ -224,6 +246,15 @@ export const actualizarIncidencia = async (req: AuthRequest, res: Response) => {
           comentario || `Estado actualizado de ${estadoAnterior} a ${estado_incidencia}`,
         ]
       );
+
+      // Notificar al usuario que reporto la incidencia (si no fue quien hizo el cambio)
+      if (id_usuario !== idUsuarioHistorial) {
+        await cliente.query(
+          `INSERT INTO notificaciones (id_usuario, id_incidencia, mensaje)
+           VALUES ($1, $2, $3)`,
+          [id_usuario, id, `Tu incidencia "${titulo_incidencia}" cambió a estado: ${estado_incidencia}`]
+        );
+      }
     }
 
     await cliente.query('COMMIT');
