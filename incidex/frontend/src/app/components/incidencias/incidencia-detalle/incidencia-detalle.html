@@ -42,7 +42,28 @@
       <div class="adjuntos" *ngIf="data.adjuntos.length > 0">
         <b class="adjuntos-titulo">Adjuntos</b>
         <div class="adjuntos-lista">
-          <span class="adjunto-chip" *ngFor="let adj of data.adjuntos">{{ adj.nombre_archivo }}</span>
+          <button
+            type="button"
+            class="adjunto-chip"
+            *ngFor="let adj of data.adjuntos"
+            (click)="abrirAdjunto(adj)"
+          >
+            <svg *ngIf="esImagen(adj.tipo_archivo)" class="icono-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <circle cx="8.5" cy="9.5" r="1.5" />
+              <path d="m21 16-5-5-4 4-3-3-5 5" />
+            </svg>
+            <svg *ngIf="esVideo(adj.tipo_archivo)" class="icono-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2.5" y="5.5" width="14" height="13" rx="2" />
+              <path d="M16.5 10.5 21 8v8l-4.5-2.5" />
+            </svg>
+            <svg *ngIf="!esImagen(adj.tipo_archivo) && !esVideo(adj.tipo_archivo)" class="icono-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2.5h8l4 4v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-15a2 2 0 0 1 2-2Z" />
+              <path d="M14 2.5v4h4" />
+              <path d="M8 12.5h8M8 16h8" />
+            </svg>
+            {{ adj.nombre_archivo }}
+          </button>
         </div>
       </div>
     </div>
@@ -131,5 +152,17 @@
         </li>
       </ul>
     </div>
+  </div>
+</div>
+
+<div class="modal-fondo" *ngIf="adjuntoPrevio() as adj" (click)="cerrarPrevio()">
+  <div class="modal-contenido" (click)="$event.stopPropagation()">
+    <div class="modal-encabezado">
+      <span class="modal-nombre">{{ adj.nombre_archivo }}</span>
+      <button type="button" class="modal-cerrar" (click)="cerrarPrevio()" aria-label="Cerrar">✕</button>
+    </div>
+    <img *ngIf="esImagen(adj.tipo_archivo)" [src]="archivoUrl(adj.ruta_archivo)" [alt]="adj.nombre_archivo" />
+    <video *ngIf="esVideo(adj.tipo_archivo)" [src]="archivoUrl(adj.ruta_archivo)" controls autoplay></video>
+    <a class="modal-descargar" [href]="archivoUrl(adj.ruta_archivo)" target="_blank">Abrir en una pestaña nueva ↗</a>
   </div>
 </div>

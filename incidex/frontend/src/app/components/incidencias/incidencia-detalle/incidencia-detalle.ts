@@ -11,6 +11,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { DetalleIncidencia, EstadoIncidencia } from '../../../models/incidencia.model';
 import { Categoria } from '../../../models/catalogo.model';
 import { Usuario } from '../../../models/usuario.model';
+import { Adjunto } from '../../../models/seguimiento.model';
 import { ClaseEstadoPipe } from '../../../pipe/clase-estado.pipe';
 import { ClasePrioridadPipe } from '../../../pipe/clase-prioridad.pipe';
 import { EstadoLegiblePipe } from '../../../pipe/estado-legible.pipe';
@@ -19,6 +20,7 @@ import { FechaCortaPipe } from '../../../pipe/fecha-corta.pipe';
 import { InicialesPipe } from '../../../pipe/iniciales.pipe';
 
 const ORDEN_ESTADOS: EstadoIncidencia[] = ['Pendiente', 'En Revision', 'En Proceso', 'Resuelto', 'Cerrado'];
+const SERVIDOR_URL = 'http://localhost:3000';
 
 @Component({
   selector: 'app-incidencia-detalle',
@@ -64,6 +66,8 @@ export class IncidenciaDetalle implements OnInit {
 
   usuarioAsignar: number | null = null;
   asignando = signal(false);
+
+  adjuntoPrevio = signal<Adjunto | null>(null);
 
   idIncidencia = 0;
 
@@ -129,6 +133,30 @@ export class IncidenciaDetalle implements OnInit {
   get asignacionActiva() {
     const asignaciones = this.detalle()?.asignaciones ?? [];
     return asignaciones.find((a) => a.estado_asignacion) ?? null;
+  }
+
+  archivoUrl(ruta: string): string {
+    return `${SERVIDOR_URL}${ruta}`;
+  }
+
+  esImagen(tipo: string | null): boolean {
+    return !!tipo?.startsWith('image/');
+  }
+
+  esVideo(tipo: string | null): boolean {
+    return !!tipo?.startsWith('video/');
+  }
+
+  abrirAdjunto(adjunto: Adjunto): void {
+    if (this.esImagen(adjunto.tipo_archivo) || this.esVideo(adjunto.tipo_archivo)) {
+      this.adjuntoPrevio.set(adjunto);
+    } else {
+      window.open(this.archivoUrl(adjunto.ruta_archivo), '_blank');
+    }
+  }
+
+  cerrarPrevio(): void {
+    this.adjuntoPrevio.set(null);
   }
 
   enviarComentario(): void {
