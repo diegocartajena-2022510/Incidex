@@ -10,6 +10,7 @@ import asignacionesRoutes from './asignaciones.routes';
 import historialRoutes from './historial.routes';
 import comentariosRoutes from './comentarios.routes';
 import adjuntosRoutes from './adjuntos.routes';
+import notificacionesRoutes from './notificaciones.routes';
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use('/asignaciones', asignacionesRoutes);
 router.use('/historial', historialRoutes);
 router.use('/comentarios', comentariosRoutes);
 router.use('/adjuntos', adjuntosRoutes);
+router.use('/notificaciones', notificacionesRoutes);
 
 export default router;
