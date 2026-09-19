@@ -11,6 +11,7 @@ import { Departamento } from '../../../../models/catalogo.model';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './usuarios-tab.html',
+  styleUrl: './usuarios-tab.css',
 })
 export class UsuariosTab implements OnInit {
   private usuarioService = inject(UsuarioService);

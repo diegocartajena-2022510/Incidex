@@ -10,6 +10,7 @@ import { PrioridadLegiblePipe } from '../../../../pipe/prioridad-legible.pipe';
   standalone: true,
   imports: [CommonModule, FormsModule, PrioridadLegiblePipe],
   templateUrl: './prioridades-tab.html',
+  styleUrl: './prioridades-tab.css',
 })
 export class PrioridadesTab implements OnInit {
   private catalogoService = inject(CatalogoService);

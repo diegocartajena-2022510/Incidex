@@ -9,6 +9,7 @@ import { Ubicacion } from '../../../../models/catalogo.model';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './ubicaciones-tab.html',
+  styleUrl: './ubicaciones-tab.css',
 })
 export class UbicacionesTab implements OnInit {
   private catalogoService = inject(CatalogoService);

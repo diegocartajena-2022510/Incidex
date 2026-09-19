@@ -9,6 +9,7 @@ import { Departamento } from '../../../../models/catalogo.model';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './departamentos-tab.html',
+  styleUrl: './departamentos-tab.css',
 })
 export class DepartamentosTab implements OnInit {
   private catalogoService = inject(CatalogoService);

@@ -190,6 +190,7 @@ nav a.activo {
     inset: 0;
     background: rgba(13, 28, 58, 0.4);
     z-index: 40;
+    animation: fadeIn 0.2s ease;
   }
 
   .btn-menu {
@@ -218,6 +219,15 @@ nav a.activo {
   display: grid;
   place-items: center;
   color: var(--kinal-navy);
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.btn-campana:hover {
+  background: #e6e9ef;
+}
+
+.btn-campana:active {
+  transform: scale(0.94);
 }
 
 .icono-svg {
@@ -264,6 +274,19 @@ nav a.activo {
   box-shadow: var(--sombra-lg);
   border: 1px solid var(--border);
   z-index: 70;
+  transform-origin: top right;
+  animation: panelNotificaciones 0.18s ease;
+}
+
+@keyframes panelNotificaciones {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .panel-encabezado {
@@ -309,6 +332,7 @@ nav a.activo {
   text-align: left;
   cursor: pointer;
   font-family: inherit;
+  transition: background 0.12s ease;
 }
 
 .notificacion:hover {
