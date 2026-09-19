@@ -13,7 +13,7 @@
   position: relative;
   background:
     linear-gradient(160deg, rgba(21, 42, 84, 0.88) 0%, rgba(13, 28, 58, 0.94) 100%),
-    url('/images/campus.jpg') center / cover no-repeat,
+    url('/images/KINAL.png') center / cover no-repeat,
     linear-gradient(160deg, var(--kinal-navy) 0%, var(--kinal-navy-dark) 100%);
   color: var(--text-inverso);
   padding: 3rem;
