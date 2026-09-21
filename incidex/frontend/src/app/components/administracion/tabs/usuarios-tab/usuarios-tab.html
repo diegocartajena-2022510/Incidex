@@ -1,0 +1,82 @@
+<div class="banner error" *ngIf="mensajeError()">{{ mensajeError() }}</div>
+
+<div class="formulario-usuario">
+  <div class="form-grid">
+    <div class="campo">
+      <label>Nombre</label>
+      <input type="text" [(ngModel)]="nuevo.nombre" placeholder="Nombre" />
+    </div>
+    <div class="campo">
+      <label>Apellido</label>
+      <input type="text" [(ngModel)]="nuevo.apellido" placeholder="Apellido" />
+    </div>
+    <div class="campo">
+      <label>Correo institucional</label>
+      <input type="email" [(ngModel)]="nuevo.correo" placeholder="usuario@kinal.edu.gt" />
+    </div>
+    <div class="campo">
+      <label>Teléfono</label>
+      <input type="text" [(ngModel)]="nuevo.telefono" placeholder="Opcional" />
+    </div>
+    <div class="campo">
+      <label>Usuario</label>
+      <input type="text" [(ngModel)]="nuevo.usuario" placeholder="Usuario para iniciar sesión" />
+    </div>
+    <div class="campo">
+      <label>Contraseña</label>
+      <input type="password" [(ngModel)]="nuevo.contrasena" placeholder="Contraseña inicial" />
+    </div>
+    <div class="campo">
+      <label>Rol</label>
+      <select [(ngModel)]="nuevo.rol">
+        <option value="" disabled>Selecciona un rol</option>
+        <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+      </select>
+    </div>
+    <div class="campo">
+      <label>Departamento</label>
+      <select [(ngModel)]="nuevo.id_departamento">
+        <option [ngValue]="null">Sin departamento</option>
+        <option *ngFor="let d of departamentos()" [ngValue]="d.id_departamento">{{ d.nombre_departamento }}</option>
+      </select>
+    </div>
+  </div>
+  <button class="btn btn-sm" [disabled]="guardando() || !formularioValido" (click)="agregar()">
+    + Agregar usuario
+  </button>
+</div>
+
+<p class="vacio" *ngIf="cargando()">Cargando usuarios...</p>
+
+<div class="tabla-wrap" *ngIf="!cargando()">
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Usuario</th>
+        <th>Rol</th>
+        <th>Departamento</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of usuarios()">
+        <td class="titulo-celda">{{ u.nombre_usuario }} {{ u.apellido_usuario }}</td>
+        <td>{{ u.usuario_login }}</td>
+        <td>{{ u.rol_login }}</td>
+        <td>{{ u.nombre_departamento || '—' }}</td>
+        <td>
+          <span class="badge" [ngClass]="u.estado_usuario ? 'estado-resuelto' : 'estado-cerrado'">
+            {{ u.estado_usuario ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-outline" (click)="toggleEstado(u)">
+            {{ u.estado_usuario ? 'Desactivar' : 'Activar' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

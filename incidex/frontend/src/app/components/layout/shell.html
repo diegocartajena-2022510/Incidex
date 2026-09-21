@@ -1,0 +1,88 @@
+<div class="layout">
+  <aside class="sidebar" [class.abierto]="menuAbierto()">
+    <div class="marca">
+      <div class="escudo">K</div>
+      <div>
+        <p class="marca-nombre">Fundación Kinal</p>
+        <p class="marca-slogan">Incidex</p>
+      </div>
+    </div>
+
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="activo" (click)="cerrarMenu()">Panel principal</a>
+      <a routerLink="/incidencias" routerLinkActive="activo" (click)="cerrarMenu()">Incidencias</a>
+      <a
+        *ngIf="puedeCrearIncidencia"
+        routerLink="/incidencias/nueva"
+        routerLinkActive="activo"
+        (click)="cerrarMenu()"
+      >
+        Nueva incidencia
+      </a>
+      <a *ngIf="esAdministrador" routerLink="/administracion" routerLinkActive="activo" (click)="cerrarMenu()">
+        Administración
+      </a>
+    </nav>
+
+    <div class="usuario">
+      <div class="avatar">{{ nombreCompleto | iniciales }}</div>
+      <div class="usuario-info">
+        <p class="usuario-nombre">{{ nombreCompleto }}</p>
+        <p class="usuario-rol">{{ usuario?.rol_login }}</p>
+      </div>
+    </div>
+    <button class="btn-salir" (click)="cerrarSesion()">Cerrar sesión</button>
+  </aside>
+
+  <div class="overlay" *ngIf="menuAbierto()" (click)="cerrarMenu()"></div>
+
+  <div class="contenido">
+    <header class="topbar">
+      <button class="btn-menu" (click)="toggleMenu()" aria-label="Abrir menu">☰</button>
+      <p class="topbar-institucion">Fundación Kinal · Sistema de Gestión de Incidencias</p>
+
+      <div class="notificaciones-contenedor">
+        <button
+          class="btn-campana"
+          (click)="toggleNotificaciones()"
+          aria-label="Notificaciones"
+        >
+          <svg class="icono-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8a6 6 0 1 0-12 0c0 3.5-1 5.5-2 7h16c-1-1.5-2-3.5-2-7Z" />
+            <path d="M10 20a2 2 0 0 0 4 0" />
+          </svg>
+          <span class="contador" *ngIf="noLeidas > 0">{{ noLeidas > 9 ? '9+' : noLeidas }}</span>
+        </button>
+
+        <div class="overlay-notificaciones" *ngIf="notificacionesAbiertas()" (click)="cerrarNotificaciones()"></div>
+
+        <div class="panel-notificaciones" *ngIf="notificacionesAbiertas()">
+          <div class="panel-encabezado">
+            <span>Notificaciones</span>
+            <button *ngIf="noLeidas > 0" class="marcar-todas" (click)="marcarTodasLeidas()">Marcar todas leídas</button>
+          </div>
+
+          <p class="sin-notificaciones" *ngIf="notificaciones().length === 0">No tienes notificaciones.</p>
+
+          <button
+            type="button"
+            class="notificacion"
+            [class.no-leida]="!n.leida"
+            *ngFor="let n of notificaciones()"
+            (click)="abrirNotificacion(n)"
+          >
+            <span class="punto" *ngIf="!n.leida"></span>
+            <span class="notificacion-texto">
+              <span class="notificacion-mensaje">{{ n.mensaje }}</span>
+              <span class="notificacion-fecha">{{ n.fecha_creacion | fechaCorta:true }}</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="vista">
+      <router-outlet />
+    </main>
+  </div>
+</div>

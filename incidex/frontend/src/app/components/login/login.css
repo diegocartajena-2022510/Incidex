@@ -1,0 +1,223 @@
+:host {
+  display: block;
+  animation: fadeIn 0.35s ease;
+}
+
+.pantalla {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+}
+
+.panel-marca {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(21, 42, 84, 0.88) 0%, rgba(13, 28, 58, 0.94) 100%),
+    url('/images/KINAL.png') center / cover no-repeat,
+    linear-gradient(160deg, var(--kinal-navy) 0%, var(--kinal-navy-dark) 100%);
+  color: var(--text-inverso);
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.capa-oscura {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 85% 15%, rgba(184, 145, 47, 0.18), transparent 45%);
+  pointer-events: none;
+}
+
+.contenido-marca {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 520px;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.escudo {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--kinal-gold);
+  color: var(--kinal-navy-dark);
+  font-weight: 800;
+  font-size: 1.3rem;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.marca-nombre {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.marca-slogan {
+  color: var(--kinal-gold-light);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.texto-principal h1 {
+  color: #fff;
+  font-size: 2.15rem;
+  line-height: 1.25;
+  margin-bottom: 1rem;
+}
+
+.texto-principal h1 span {
+  color: var(--kinal-gold-light);
+}
+
+.descripcion {
+  color: #d7dded;
+  line-height: 1.65;
+}
+
+.caracteristicas {
+  list-style: none;
+  margin: 0;
+  padding: 1.25rem 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.caracteristicas li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  color: #e3e7f1;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.icono {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(184, 145, 47, 0.25);
+  color: var(--kinal-gold-light);
+  font-size: 0.7rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  margin-top: 0.1rem;
+}
+
+.panel-formulario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: var(--bg);
+}
+
+.tarjeta {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border-radius: 14px;
+  box-shadow: var(--sombra-lg);
+  padding: 2.25rem;
+}
+
+.tarjeta h2 {
+  font-size: 1.3rem;
+  margin-bottom: 0.25rem;
+}
+
+.subtitulo {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.banner {
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  font-size: 0.85rem;
+}
+
+.banner.error {
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid #f0d3d0;
+}
+
+.campo {
+  margin-bottom: 1.1rem;
+}
+
+input.invalido {
+  border-color: var(--error);
+}
+
+.error-texto {
+  color: var(--error);
+  font-size: 0.78rem;
+  margin-top: 0.3rem;
+}
+
+button[type='submit'] {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.4rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--kinal-navy);
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.15s ease;
+}
+
+button[type='submit']:hover:not(:disabled) {
+  background: var(--kinal-navy-light);
+}
+
+button[type='submit']:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pie-tarjeta {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 860px) {
+  .pantalla {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-marca {
+    padding: 2.25rem;
+  }
+
+  .texto-principal h1 {
+    font-size: 1.6rem;
+  }
+
+  .caracteristicas {
+    display: none;
+  }
+}
